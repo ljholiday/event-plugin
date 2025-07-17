@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: Event Manager
- * Plugin URI: https://example.com/event-manager
+ * Plugin Name: Party-Minder
+ * Plugin URI: https://example.com/party-minder
  * Description: Allows visitors to create events like dinner parties and house parties and invite friends.
  * Version: 1.0.0
  * Author: Your Name
@@ -14,11 +14,11 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('EVENT_MANAGER_VERSION', '1.0.0');
-define('EVENT_MANAGER_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('EVENT_MANAGER_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('PARTY_MINDER_VERSION', '1.0.0');
+define('PARTY_MINDER_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('PARTY_MINDER_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-class EventManager {
+class PartyMinder {
     
     public function __construct() {
         add_action('init', array($this, 'init'));
@@ -45,12 +45,12 @@ class EventManager {
     }
     
     public function enqueue_scripts() {
-        wp_enqueue_script('event-manager-js', EVENT_MANAGER_PLUGIN_URL . 'assets/event-manager.js', array('jquery'), EVENT_MANAGER_VERSION, true);
-        wp_enqueue_style('event-manager-css', EVENT_MANAGER_PLUGIN_URL . 'assets/event-manager.css', array(), EVENT_MANAGER_VERSION);
+        wp_enqueue_script('party-minder-js', PARTY_MINDER_PLUGIN_URL . 'assets/party-minder.js', array('jquery'), PARTY_MINDER_VERSION, true);
+        wp_enqueue_style('party-minder-css', PARTY_MINDER_PLUGIN_URL . 'assets/party-minder.css', array(), PARTY_MINDER_VERSION);
         
-        wp_localize_script('event-manager-js', 'event_manager_ajax', array(
+        wp_localize_script('party-minder-js', 'party_minder_ajax', array(
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('event_manager_nonce')
+            'nonce' => wp_create_nonce('party_minder_nonce')
         ));
     }
     
@@ -97,13 +97,13 @@ class EventManager {
     
     public function deactivate() {
         // Clean up scheduled events if any
-        wp_clear_scheduled_hook('event_manager_cleanup');
+        wp_clear_scheduled_hook('party_minder_cleanup');
     }
     
     public function event_form_shortcode($atts) {
         ob_start();
         ?>
-        <div id="event-manager-form">
+        <div id="party-minder-form">
             <h3>Create New Event</h3>
             <form id="create-event-form">
                 <div class="form-group">
@@ -367,7 +367,7 @@ class EventManager {
     }
     
     public function handle_create_event() {
-        check_ajax_referer('event_manager_nonce', 'nonce');
+        check_ajax_referer('party_minder_nonce', 'nonce');
         
         global $wpdb;
         
@@ -624,7 +624,7 @@ class EventManager {
     }
     
     public function handle_rsvp_response() {
-        check_ajax_referer('event_manager_nonce', 'nonce');
+        check_ajax_referer('party_minder_nonce', 'nonce');
         
         global $wpdb;
         
@@ -659,13 +659,13 @@ class EventManager {
 }
 
 // Initialize the plugin
-new EventManager();
+new PartyMinder();
 
 // Create assets directory and files on activation
-register_activation_hook(__FILE__, 'event_manager_create_assets');
+register_activation_hook(__FILE__, 'party_minder_create_assets');
 
-function event_manager_create_assets() {
-    $assets_dir = EVENT_MANAGER_PLUGIN_DIR . 'assets';
+function party_minder_create_assets() {
+    $assets_dir = PARTY_MINDER_PLUGIN_DIR . 'assets';
     
     if (!file_exists($assets_dir)) {
         wp_mkdir_p($assets_dir);
@@ -673,8 +673,8 @@ function event_manager_create_assets() {
     
     // Create CSS file
     $css_content = '
-/* Event Manager Styles */
-#event-manager-form,
+/* Party-Minder Styles */
+#party-minder-form,
 #email-entry-form {
     max-width: 600px;
     margin: 20px 0;
@@ -842,7 +842,7 @@ function event_manager_create_assets() {
 }
 ';
     
-    file_put_contents($assets_dir . '/event-manager.css', $css_content);
+    file_put_contents($assets_dir . '/party-minder.css', $css_content);
     
     // Create JavaScript file
     $js_content = '
@@ -852,10 +852,10 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         
         var formData = $(this).serialize();
-        formData += "&action=create_event&nonce=" + event_manager_ajax.nonce;
+        formData += "&action=create_event&nonce=" + party_minder_ajax.nonce;
         
         $.ajax({
-            url: event_manager_ajax.ajax_url,
+            url: party_minder_ajax.ajax_url,
             type: "POST",
             data: formData,
             success: function(response) {
@@ -889,13 +889,13 @@ jQuery(document).ready(function($) {
         var response = $(this).data("response");
         
         $.ajax({
-            url: event_manager_ajax.ajax_url,
+            url: party_minder_ajax.ajax_url,
             type: "POST",
             data: {
                 action: "rsvp_response",
                 invitation_id: invitationId,
                 response: response,
-                nonce: event_manager_ajax.nonce
+                nonce: party_minder_ajax.nonce
             },
             success: function(result) {
                 if (result.success) {
@@ -919,6 +919,6 @@ jQuery(document).ready(function($) {
 });
 ';
     
-    file_put_contents($assets_dir . '/event-manager.js', $js_content);
+    file_put_contents($assets_dir . '/party-minder.js', $js_content);
 }
 ?>
