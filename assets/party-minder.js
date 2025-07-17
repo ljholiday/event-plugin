@@ -5,10 +5,10 @@ jQuery(document).ready(function($) {
         e.preventDefault();
         
         var formData = $(this).serialize();
-        formData += "&action=create_event&nonce=" + event_manager_ajax.nonce;
+        formData += "&action=create_event&nonce=" + party_minder_ajax.nonce;
         
         $.ajax({
-            url: event_manager_ajax.ajax_url,
+            url: party_minder_ajax.ajax_url,
             type: "POST",
             data: formData,
             success: function(response) {
@@ -42,13 +42,13 @@ jQuery(document).ready(function($) {
         var response = $(this).data("response");
         
         $.ajax({
-            url: event_manager_ajax.ajax_url,
+            url: party_minder_ajax.ajax_url,
             type: "POST",
             data: {
                 action: "rsvp_response",
                 invitation_id: invitationId,
                 response: response,
-                nonce: event_manager_ajax.nonce
+                nonce: party_minder_ajax.nonce
             },
             success: function(result) {
                 if (result.success) {
